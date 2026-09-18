@@ -1,25 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Check, ArrowLeft } from "lucide-react";
 import BackButton from "@/components/ui/BackButton";
 
 const hairExamples = ["עדין", "גס", "דליל", "צפוף"];
 
 export default function HairQuestion() {
-  const [selected, setSelected] = useState<string | null>(null);
-  const [customText, setCustomText] = useState("");
   const router = useRouter();
-  const canContinue = selected !== null || customText.trim() !== "";
+  const searchParams = useSearchParams();
+  const [selected, setSelected] = useState<string | null>(() => searchParams.get("hairType"));
+  const [customText, setCustomText] = useState(() => searchParams.get("hairCustom") ?? "");
+  const canContinue = customText.trim() !== "";
+
+  useEffect(() => {
+    router.prefetch("/step-4");
+  }, [router]);
 
   function handleClick(type: string) {
-    setSelected((current) => (current === type ? null : type));
+    setSelected(type);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("hairType", type);
+    params.delete("hairCustom");
+    window.history.replaceState(null, "", `/step-3?${params.toString()}`);
+    router.push(`/step-4?${params.toString()}`);
   }
 
   function handleContinue() {
     if (!canContinue) return;
-    router.push("/step-4");
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("hairCustom", customText.trim());
+    params.delete("hairType");
+    window.history.replaceState(null, "", `/step-3?${params.toString()}`);
+    router.push(`/step-4?${params.toString()}`);
   }
 
   return (
@@ -38,9 +52,9 @@ export default function HairQuestion() {
               key={type}
               type="button"
               onClick={() => handleClick(type)}
-              className={`relative min-w-28 rounded-2xl border px-7 py-4 text-lg transition-all duration-200 ease-out active:scale-95 ${
+              className={`relative min-w-28 rounded-2xl border px-7 py-4 text-lg transition-all duration-300 ease-out active:scale-95 ${
                 isSelected
-                  ? "scale-105 border-white bg-white text-[#ab1521] shadow-xl shadow-black/20"
+                  ? "scale-105 border-white bg-white text-[#ab1521] shadow-[0_0_0_4px_rgba(255,255,255,0.25),0_0_35px_12px_rgba(255,255,255,0.4)]"
                   : "border-white/30 bg-white/10 text-white backdrop-blur-sm hover:scale-105 hover:bg-white/20"
               }`}
             >
