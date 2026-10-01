@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, ArrowLeft } from "lucide-react";
 import BackButton from "@/components/ui/BackButton";
+import { withViewTransition } from "@/lib/view-transition";
 
 const hairColors = [
   { name: "חום כהה", color: "#3B2A1E" },
@@ -31,7 +32,7 @@ export default function HairColorQuestion() {
     params.set("hairColor", name);
     params.delete("hairColorCustom");
     window.history.replaceState(null, "", `/step-4?${params.toString()}`);
-    router.push(`/step-5?${params.toString()}`);
+    withViewTransition("forward", () => router.push(`/step-5?${params.toString()}`));
   }
 
   function handleContinue() {
@@ -40,18 +41,18 @@ export default function HairColorQuestion() {
     params.set("hairColorCustom", customText.trim());
     params.delete("hairColor");
     window.history.replaceState(null, "", `/step-4?${params.toString()}`);
-    router.push(`/step-5?${params.toString()}`);
+    withViewTransition("forward", () => router.push(`/step-5?${params.toString()}`));
   }
 
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center gap-10 px-6 text-center">
+    <section className="stagger-children relative flex min-h-[80vh] flex-col items-center justify-center gap-10 px-6 text-center">
       <BackButton />
 
       <h1 className="text-3xl tracking-tight text-white sm:text-4xl">
         מה צבע השיער שלך?
       </h1>
 
-      <div className="grid grid-cols-3 gap-6 sm:flex sm:flex-wrap sm:justify-center">
+      <div className="stagger-children grid grid-cols-3 gap-6 sm:flex sm:flex-wrap sm:justify-center">
         {hairColors.map(({ name, color }) => {
           const isSelected = selected === name;
           return (
@@ -71,7 +72,7 @@ export default function HairColorQuestion() {
                   style={{ backgroundColor: color }}
                 />
                 <span
-                  className={`absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#ab1521] text-white shadow-md transition-all duration-200 ${
+                  className={`absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#ab1521] text-white shadow-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
                     isSelected ? "scale-100 opacity-100" : "scale-0 opacity-0"
                   }`}
                 >

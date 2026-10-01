@@ -1,0 +1,4 @@
+.env*.local
+.playwright-mcp
+.agents
+save.code-workspace

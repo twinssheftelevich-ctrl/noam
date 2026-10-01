@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Short viewports (e.g. iPhone SE 1st gen) where one-screen steps need tighter spacing. */
+@custom-variant short (@media (max-height: 600px));
+
 :root {
   --background: #ab1521;
   --foreground: #171717;
@@ -9,14 +12,111 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-rubik);
+  --animate-fade-up: fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-pop: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 body {
+  /* Fallback for when the animated WebGL background (Velaris, in layout.tsx) can't render. */
   background-color: var(--background);
-  background-image:
-    radial-gradient(circle at 25% 15%, rgba(255, 255, 255, 0.1), transparent 55%),
-    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.25), transparent 60%),
-    linear-gradient(135deg, #7a0f17 0%, #ab1521 45%, #d1202c 100%);
-  background-attachment: fixed;
   color: var(--foreground);
+}
+
+/* Staggered entrance: each direct child fades/slides in slightly after the previous one. */
+.stagger-children > * {
+  animation: fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 210ms;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 280ms;
+}
+.stagger-children > *:nth-child(6) {
+  animation-delay: 350ms;
+}
+
+/* Native browser View Transitions for step navigation, direction-aware via html[data-nav-dir]. */
+::view-transition {
+  pointer-events: none;
+}
+
+@keyframes step-out-forward {
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+@keyframes step-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes step-out-back {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes step-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+html[data-nav-dir="forward"]::view-transition-old(root) {
+  animation: 150ms ease-in both step-out-forward;
+}
+html[data-nav-dir="forward"]::view-transition-new(root) {
+  animation: 220ms ease-out both step-in-forward;
+}
+html[data-nav-dir="back"]::view-transition-old(root) {
+  animation: 150ms ease-in both step-out-back;
+}
+html[data-nav-dir="back"]::view-transition-new(root) {
+  animation: 220ms ease-out both step-in-back;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

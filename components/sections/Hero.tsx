@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check } from "lucide-react";
 import BackButton from "@/components/ui/BackButton";
+import { RadialGradientBackground } from "@/components/ui/radial-gradient-bg";
+import { withViewTransition } from "@/lib/view-transition";
 
 const ageRanges = ["10-17", "18-25", "26-34", "35+"];
 
@@ -20,22 +22,22 @@ export default function Hero() {
 
   function handleClick(range: string) {
     setSelected(range);
-    const params = new URLSearchParams();
-    if (gender) params.set("gender", gender);
+    const params = new URLSearchParams(searchParams.toString());
     params.set("age", range);
     window.history.replaceState(null, "", `/step-2?${params.toString()}`);
-    router.push(`/step-3?${params.toString()}`);
+    withViewTransition("forward", () => router.push(`/step-3?${params.toString()}`));
   }
 
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center gap-12 px-6 text-center">
+    <section className="stagger-children relative flex min-h-[80vh] flex-col items-center justify-center gap-12 px-6 text-center">
+      <RadialGradientBackground />
       <BackButton />
 
       <h1 className="text-3xl tracking-tight text-white sm:text-4xl">
         {isFemale ? "בת כמה את?" : "בן כמה אתה?"}
       </h1>
 
-      <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:justify-center">
+      <div className="stagger-children grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:justify-center">
         {ageRanges.map((range) => {
           const isSelected = selected === range;
           return (
@@ -51,7 +53,7 @@ export default function Hero() {
             >
               {range}
               <span
-                className={`absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#ab1521] text-white shadow-md transition-all duration-200 ${
+                className={`absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#ab1521] text-white shadow-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
                   isSelected ? "scale-100 opacity-100" : "scale-0 opacity-0"
                 }`}
               >

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check } from "lucide-react";
+import { withViewTransition } from "@/lib/view-transition";
 
 const genders = ["גבר", "אישה"];
 
@@ -17,20 +18,22 @@ export default function GenderQuestion() {
 
   function handleClick(gender: string) {
     setSelected(gender);
-    window.history.replaceState(null, "", `/?gender=${encodeURIComponent(gender)}`);
-    router.push(`/step-2?gender=${encodeURIComponent(gender)}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("gender", gender);
+    window.history.replaceState(null, "", `/?${params.toString()}`);
+    withViewTransition("forward", () => router.push(`/step-2?${params.toString()}`));
   }
 
   return (
-    <section className="flex min-h-[80vh] flex-col items-center justify-center gap-12 px-6 text-center">
-      <div className="flex flex-col items-center gap-2">
+    <section className="stagger-children flex min-h-[80vh] flex-col items-center justify-center gap-12 px-6 text-center">
+      <div className="stagger-children flex flex-col items-center gap-2">
         <p className="text-4xl text-white/90 sm:text-5xl">שלום! מה שלומך?</p>
         <h1 className="text-3xl tracking-tight text-white sm:text-4xl">
           מה המין שלך?
         </h1>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-4">
+      <div className="stagger-children flex flex-wrap items-center justify-center gap-4">
         {genders.map((gender) => {
           const isSelected = selected === gender;
           return (
@@ -46,7 +49,7 @@ export default function GenderQuestion() {
             >
               {gender}
               <span
-                className={`absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#ab1521] text-white shadow-md transition-all duration-200 ${
+                className={`absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#ab1521] text-white shadow-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
                   isSelected ? "scale-100 opacity-100" : "scale-0 opacity-0"
                 }`}
               >

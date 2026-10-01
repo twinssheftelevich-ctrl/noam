@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, ArrowLeft } from "lucide-react";
 import BackButton from "@/components/ui/BackButton";
+import { withViewTransition } from "@/lib/view-transition";
 
 const hairExamples = ["עדין", "גס", "דליל", "צפוף"];
 
@@ -24,7 +25,7 @@ export default function HairQuestion() {
     params.set("hairType", type);
     params.delete("hairCustom");
     window.history.replaceState(null, "", `/step-3?${params.toString()}`);
-    router.push(`/step-4?${params.toString()}`);
+    withViewTransition("forward", () => router.push(`/step-4?${params.toString()}`));
   }
 
   function handleContinue() {
@@ -33,18 +34,18 @@ export default function HairQuestion() {
     params.set("hairCustom", customText.trim());
     params.delete("hairType");
     window.history.replaceState(null, "", `/step-3?${params.toString()}`);
-    router.push(`/step-4?${params.toString()}`);
+    withViewTransition("forward", () => router.push(`/step-4?${params.toString()}`));
   }
 
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center gap-10 px-6 text-center">
+    <section className="stagger-children relative flex min-h-[80vh] flex-col items-center justify-center gap-10 px-6 text-center">
       <BackButton />
 
       <h1 className="text-3xl tracking-tight text-white sm:text-4xl">
         איזה שיער יש לך בגוף?
       </h1>
 
-      <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:justify-center">
+      <div className="stagger-children grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:justify-center">
         {hairExamples.map((type) => {
           const isSelected = selected === type;
           return (
@@ -60,7 +61,7 @@ export default function HairQuestion() {
             >
               {type}
               <span
-                className={`absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#ab1521] text-white shadow-md transition-all duration-200 ${
+                className={`absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#ab1521] text-white shadow-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
                   isSelected ? "scale-100 opacity-100" : "scale-0 opacity-0"
                 }`}
               >
